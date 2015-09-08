@@ -76,7 +76,7 @@ class TinymceSymlinkCommand extends ContainerAwareCommand
     public static function createSymlink($symlinkTarget, $symlinkName)
     {
         if (false === @symlink($symlinkTarget, $symlinkName)) {
-            throw new \Exception(sprintf('The symlink at "%s" could not be created.', $symlinkName));
+            throw new \Exception(sprintf('Symlink "%s" pointing to target "%s" could not be created.', $symlinkName, $symlinkTarget));
         }
         if (false === $target = readlink($symlinkName)) {
             throw new \Exception(sprintf('Symlink "%s" points to target "%s".', $symlinkName, $target));
