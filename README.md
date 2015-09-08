@@ -17,13 +17,17 @@ Add TinyMCE bundle as a dependency to the composer.json of your application with
 Add TinyMCE automatic symlinking
 
     "scripts": {
-	"post-install-cmd": [
-	    "Stfalcon\\Bundle\\TinymceBundle\\Composer\\ScriptHandler::postInstallSymlinkTinymce"
-	],
-	"post-update-cmd": [
-	    "Stfalcon\\Bundle\\TinymceBundle\\Composer\\ScriptHandler::postInstallSymlinkTinymce"
-	]
+        "post-install-cmd": [
+            "Stfalcon\\Bundle\\TinymceBundle\\Composer\\ScriptHandler::postInstallSymlinkTinymce"
+        ],
+        "post-update-cmd": [
+            "Stfalcon\\Bundle\\TinymceBundle\\Composer\\ScriptHandler::postInstallSymlinkTinymce"
+        ]
     },
+
+Or use the console command
+
+    app/console stfalcon:tinymce:symlink
 
 ## Add StfalconTinymceBundle to your application kernel.
 

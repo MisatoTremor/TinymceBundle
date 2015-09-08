@@ -3,53 +3,60 @@
 namespace Stfalcon\Bundle\TinymceBundle\Composer;
 
 use Composer\Script\Event;
-use Composer\Composer;
+use Mopa\Bridge\Composer\Util\ComposerPathFinder;
+use Stfalcon\Bundle\TinymceBundle\Command\TinymceSymlinkCommand;
 
 /**
  * Class ScriptHandler.
- *
- * @package Stfalcon\Bundle\TinymceBundle\Composer
  */
 class ScriptHandler
 {
-    const TINYMCE_PACKAGE_NAME = 'tinymce/tinymce';
-
-    /**
-     * @param \Composer\Script\Event $event
-     */
-    public static function createSymlink(Event $event)
+    public static function postInstallSymlinkTinymce(Event $event)
     {
-        $localPath = sprintf('%s/../Resources/public/vendor/tinymce', __DIR__);
-        if (is_link($localPath)) {
-            return;
+        $IO = $event->getIO();
+        $composer = $event->getComposer();
+        $cmanager = new ComposerPathFinder($composer);
+        $options = array(
+            'targetSuffix' => self::getTargetSuffix(),
+            'sourcePrefix' => '..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR,
+        );
+        list($symlinkTarget, $symlinkName) = $cmanager->getSymlinkFromComposer(
+            TinymceSymlinkCommand::$tinymceBundleName,
+            TinymceSymlinkCommand::$tinymceName,
+            $options
+        );
+        $IO->write('Checking Symlink', false);
+        if (false === TinymceSymlinkCommand::checkSymlink($symlinkTarget, $symlinkName, true)) {
+            $IO->write('Creating Symlink: '.$symlinkName, false);
+            TinymceSymlinkCommand::createSymlink($symlinkTarget, $symlinkName);
         }
-
-        $tinymceFilePath = self::getPackageInstallationPath($event->getComposer(), self::TINYMCE_PACKAGE_NAME);
-        if (!symlink($tinymceFilePath, $localPath)) {
-            throw new \RuntimeException("Unable to create the symlink '$localPath' to the folder '$tinymceFilePath'");
-        }
+        $IO->write(' ... <info>OK</info>');
     }
 
-    /**
-     * @param \Composer\Composer $composer
-     * @param string $packageName
-     * @return string
-     *
-     * @throws \RuntimeException
-     */
-    protected static function getPackageInstallationPath(Composer $composer, $packageName)
+    public static function postInstallMirrorTinymce(Event $event)
     {
-        /* @var \Composer\Repository\PackageRepository $repoManager */
-        $repoManager = $composer->getRepositoryManager();
-
-        /* @var \Composer\Installer\InstallationManager $installManager */
-        $installManager = $composer->getInstallationManager();
-
-        $package = $repoManager->findPackage($packageName, '*');
-        if (empty($package)) {
-            throw new \RuntimeException("Unable to find the '$packageName' package.");
+        $IO = $event->getIO();
+        $composer = $event->getComposer();
+        $cmanager = new ComposerPathFinder($composer);
+        $options = array(
+            'targetSuffix' => self::getTargetSuffix(),
+            'sourcePrefix' => '..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR,
+        );
+        list($symlinkTarget, $symlinkName) = $cmanager->getSymlinkFromComposer(
+            TinymceSymlinkCommand::$tinymceBundleName,
+            TinymceSymlinkCommand::$tinymceName,
+            $options
+        );
+        $IO->write('Checking Mirror', false);
+        if (false === TinymceSymlinkCommand::checkSymlink($symlinkTarget, $symlinkName)) {
+            $IO->write('Creating Mirror: '.$symlinkName, false);
+            TinymceSymlinkCommand::createMirror($symlinkTarget, $symlinkName);
         }
+        $IO->write(' ... <info>OK</info>');
+    }
 
-        return $installManager->getInstallPath($package);
+    protected static function getTargetSuffix()
+    {
+        return DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'tinymce';
     }
 }
