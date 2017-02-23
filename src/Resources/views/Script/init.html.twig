@@ -9,9 +9,11 @@
     <script defer src="{{ asset(base_url~'bundles/stfalcontinymce/js/ready.min.js') }}"></script>
     <script defer src="{{ asset(base_url~'bundles/stfalcontinymce/js/init.standard.js') }}"></script>
 {% endif %}
-<script defer>
+<script>
 //<![CDATA[
-    stfalcon_tinymce_config = {{ tinymce_config|raw }};
-    initTinyMCE();
+    document.addEventListener("DOMContentLoaded", function() {
+        stfalcon_tinymce_config = {{ tinymce_config|raw }};
+        initTinyMCE();
+    });
 //]]>
 </script>
